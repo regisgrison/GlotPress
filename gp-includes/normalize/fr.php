@@ -18,15 +18,15 @@ require_once GP_PATH . GP_INC . 'normalize/common.php';
  *
  * @return string
  */
-function glotpress_normalize_for_locale( string $str ): string {
+function gp_normalize_for_locale( string $str ): string {
 	$nbsp  = html_entity_decode( '&nbsp;' );
 	$space = '[ \t' . $nbsp . ']';
 
 	// First extract invariants.
-	$invariants = glotpress_extract_invariants( $str );
+	$invariants = gp_extract_invariants( $str );
 
 	// Replace invariants by a placeholder.
-	$str = glotpress_insert_placeholder_invariants( $str, $invariants );
+	$str = gp_insert_placeholder_invariants( $str, $invariants );
 
 	// "etc." with a single dot after.
 	$str = preg_replace( '/ *etc[. ]*/u', ' etc. ', $str );
@@ -72,5 +72,5 @@ function glotpress_normalize_for_locale( string $str ): string {
 	$str = preg_replace( '/' . $space . '*' . $nbsp . $space . '*/mu', $nbsp, $str );
 
 	// Insert invariants back in text.
-	return glotpress_replace_placeholder_invariants( $str, $invariants );
+	return gp_replace_placeholder_invariants( $str, $invariants );
 }

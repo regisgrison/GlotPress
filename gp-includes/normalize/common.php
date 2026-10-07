@@ -14,15 +14,16 @@
  *
  * @return array
  */
-function glotpress_extract_invariants( string $str ): array {
+function gp_extract_invariants( string $str ): array {
 	// Extract URLs.
 	preg_match_all( '/https?:\/\/[^\s"»]+/u', $str, $matches1 );
 
 	// Extract html tags.
 	preg_match_all( '/<[^>]+>/u', $str, $matches2 );
 
-	// Extract fprintf placeholders.
-	preg_match_all( '/%\d*\$[sdf]/u', $str, $matches3 );
+	// Extract fprintf placeholders. Uses the same regex as gp-includes/warnings.php in warning_placeholders() function.
+	$placeholders_re = apply_filters( 'gp_warning_placeholders_re', '(?<!%)%(\d+\$(?:\d+)?)?(\.\d+)?[bcdefgosuxEFGX%l@]' );
+	preg_match_all( '/' . $placeholders_re . '/u', $str, $matches3 );
 
 	return array_merge( $matches1[0], $matches2[0], $matches3[0] );
 }
@@ -35,7 +36,7 @@ function glotpress_extract_invariants( string $str ): array {
  *
  * @return string
  */
-function glotpress_insert_placeholder_invariants( string $str, array $invariants ): string {
+function gp_insert_placeholder_invariants( string $str, array $invariants ): string {
 	foreach ( $invariants as $invariant ) {
 		$str = str_replace( $invariant, 'INVARIANT' . md5( $invariant ), $str );
 	}
@@ -51,7 +52,7 @@ function glotpress_insert_placeholder_invariants( string $str, array $invariants
  *
  * @return string
  */
-function glotpress_replace_placeholder_invariants( string $str, array $invariants ): string {
+function gp_replace_placeholder_invariants( string $str, array $invariants ): string {
 	foreach ( $invariants as $invariant ) {
 		$str = str_replace( 'INVARIANT' . md5( $invariant ), $invariant, $str );
 	}
