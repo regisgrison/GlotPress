@@ -93,6 +93,11 @@ class GP_Route_Glossary extends GP_Route_Main {
 
 		if ( ! $glossary ) {
 			$this->redirect_with_error( __( 'Cannot find glossary.', 'glotpress' ) );
+			return;
+		}
+
+		if ( $this->cannot_edit_glossary_and_redirect( $glossary ) ) {
+			return;
 		}
 
 		$translation_set = GP::$translation_set->get( $glossary->translation_set_id );
@@ -107,12 +112,20 @@ class GP_Route_Glossary extends GP_Route_Main {
 			return;
 		}
 
-		$glossary     = GP::$glossary->get( $glossary_id );
+		$glossary = GP::$glossary->get( $glossary_id );
+		if ( ! $glossary ) {
+			$this->redirect_with_error( __( 'Cannot find glossary.', 'glotpress' ) );
+			return;
+		}
+
 		$new_glossary = new GP_Glossary( gp_post( 'glossary' ) );
 
 		if ( $this->cannot_edit_glossary_and_redirect( $glossary ) ) {
 			return;
 		}
+
+		// The set a glossary belongs to is fixed at creation; ignore any client-supplied value so it cannot be moved to another set.
+		$new_glossary->translation_set_id = $glossary->translation_set_id;
 
 		if ( ! $glossary->update( $new_glossary ) ) {
 			$this->errors[] = __( 'Error in updating glossary!', 'glotpress' );
@@ -209,5 +222,4 @@ class GP_Route_Glossary extends GP_Route_Main {
 	private function cannot_delete_glossary_and_redirect( $glossary ) {
 		return $this->cannot_and_redirect( 'delete', 'translation-set', $glossary->translation_set_id );
 	}
-
 }
